@@ -1,65 +1,39 @@
-const sequelize = require('sequelize');
-const { host, user, password, database, port } = require('../config.js');
-const Promise = require('bluebird');
-const options = { promiseLib: Promise };
-const pgp = require('pg-promise')(options);
-const pg = require('pg');
-const { Pool, Client } = require('pg');
+const mongoose = require('mongoose');
 
-// pg.defaults.poolSize = 20;
+mongoose.connect('mongodb://localhost/qa', {useNewUrlParser: true});
 
-// const pool = new Pool({
-//   user: user,
-//   host: host,
-//   database: database,
-//   password: password,
-//   port: port,
-//   idleTimeoutMillis: 50000,
-//   connectionTimeoutMillis: 20000
-// });
+const db = mongoose.connection;
 
-// const client = new Client({
-//   user: user,
-//   host: host,
-//   database: database,
-//   password: password,
-//   port: port,
-// })
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('Connected to db...');
+})
 
-// client.connect();
+const questionsSchema = new mongoose.Schema({
+  id: Number,
+  question_body: String,
+  question_date: Date,
+  asker_name: String,
+  asker_email: String,
+  question_helpfulness: Number,
+  reported: Number,
+  product_id: Number
+}, {collection: 'questions'});
 
-// client.on('error', (err) => {
-//   console.error('CLIENT An idle client has experienced an error', err.stack)
-// });
+const answersSchema = new mongoose.Schema({
+  id: Number,
+  body: String,
+  answer_date: Date,
+  answerer_name: String,
+  email: String,
+  helpfulness: Number,
+  reported: Number,
+  question_id: Number,
+  photos: Array
+}, {collection: 'combined_answers'});
 
-// pool.connect((err, client, release) => {
-//   if (err) {
-//     return console.error('Error acquiring client', err.stack)
-//   }
-//   client.query('SELECT NOW()', (err, result) => {
-//     release()
-//     if (err) {
-//       return console.error('Error executing query', err.stack)
-//     }
-//     console.log(result.rows)
-//   })
-// });
+const Question = mongoose.model('Question', questionsSchema);
+const Answer = mongoose.model('Answer', answersSchema);
 
-// pool.on('error', (err) => {
-//   console.error('POOL An idle client has experienced an error', err.stack)
-// })
-
-
-
-// module.exports = pool;
-
-const connection = {
-  host: host,
-  port: port,
-  database: database,
-  user: user,
-  password: password
-};
-const db = pgp(connection);
-
-module.exports.db = db;
+module.exports.Question = Question;
+module.exports.Answer = Answer;
