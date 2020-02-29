@@ -57,3 +57,5 @@ const pool = db.$pool;
 //     })
 //     )
 //     .pipe(etl.postgres.upsert(pool, 'public', 'photos'));
+
+// db.answers.aggregate([{$lookup: {from:"photos",localField:"answer_id",foreignField:"answer_id",as:"photos"}}, {$out: "combined_answers"}])

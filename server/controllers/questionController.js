@@ -16,7 +16,8 @@ module.exports = {
     let page = req.query.page ? req.query.page : 1;
     let count = req.query.count ? req.query.count : 5;
 
-    res.send(questionModel.read(req.params, page, count));
+    questionModel.read(req.params, page, count)
+      .then(data => console.log(data));
   },
 
   addQuestion: (req, res) => {

@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS fitcart_qa;
+CREATE DATABASE IF NOT EXISTS qa;
 
-USE fitcart_qa;
+USE qa;
 
 create table questions (
   id serial primary key,

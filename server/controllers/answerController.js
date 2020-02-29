@@ -2,11 +2,18 @@ const answerModel = require('../models/answerModel.js');
 const photoModel = require('../models/photoModel.js');
 
 module.exports = {
-  getAnswers: (req, res) => {
+  getAnswers: async (req, res) => {
     let page = req.query.page ? req.query.page : 1;
     let count = req.query.count ? req.query.count : 5;
-    //answerModel.read(req.params, page, count);
-    res.send('answer get');
+
+    let data = await answerModel.read(req.params, page, count);
+
+    res.send(data);
+
+    // answerModel.read(req.params, page, count)
+    //   .then((data) => {
+    //     res.send('answer get');
+    //   });
   },
 
   addAnswer: (req, res) => {
