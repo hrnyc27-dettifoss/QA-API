@@ -36,26 +36,16 @@ const {Answer} = require('../../db/index.js');
 
 module.exports = {
   read: ({question_id}, page, count) => {
-    let skip = (page - 1) * count;
+    
+    let skip = (parseInt(page) - 1) * parseInt(count);
+    console.log(page, count, 2, 3);
+    console.log(question_id, 1);
 
-    return Answer.find({question_id: question_id},'answer_id body date answerer_name helpfulness photos -_id').skip(skip).limit(count);
+    return Answer.find({question_id: parseInt(question_id)},'answer_id body date answerer_name helpfulness photos -_id').sort({helpfulness: -1}).skip(skip).limit(count);
   },
 
   readAll: (question_id) => {
-    let queryString = `
-      SELECT 
-        * 
-      FROM 
-        answers 
-      WHERE 
-        question_id = ${question_id}
-          AND
-        reported = 0
-      ORDER BY
-        helpfulness DESC
-    `;
-
-    return db.query(queryString);
+    return Answer.find({question_id: question_id},'answer_id body date answerer_name helpfulness photos -_id');
   },
 
   create: ({question_id}, {body, name, email}) => {

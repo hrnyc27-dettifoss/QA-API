@@ -1,4 +1,4 @@
-const db = require('../../db/index.js');
+const {connection, Question} = require('../../db/index.js');
 
 // expected data
 // {
@@ -51,126 +51,28 @@ const db = require('../../db/index.js');
 //       // ...
 //   ]
 // }
+// db.answers.aggregate([{$lookup: {from:"photos",localField:"answer_id",foreignField:"answer_id",as:"photos"}}, {$out: "combined_answers"}])
 
-// working query
-// let queryString = `
-//       SELECT 
-//         *
-//       FROM 
-//         questions
-//       WHERE
-//         product_id = ${product_id} 
-//       ORDER BY
-//         question_helpfulness DESC 
-//       LIMIT 
-//         ${count} 
-//       OFFSET 
-//         ${offset}
-//     `;
-
-// SELECT 
-//         q.id AS question_id,
-//         q.question_body,
-//         q.question_date,
-//         q.asker_name,
-//         q.question_helpfulness,
-//         q.reported,
-//         a.id,
-//         a.body,
-//         a.answer_date AS date,
-//         a.answerer_name,
-//         a.helpfulness,
-//         p.id AS photo_id,
-//         p.url
-//       FROM 
-//         questions q
-//       INNER JOIN answers a ON a.question_id = question_id
-//       INNER JOIN photos p ON p.answer_id = a.id
-//       WHERE
-//         q.product_id = ${product_id} 
-//       ORDER BY
-//         q.question_helpfulness DESC 
-//       LIMIT 
-//         ${count} 
-//       OFFSET 
-//         ${offset}
-
-// select row_to_json(art) as artists
-// from(
-//   select a.id, a.name, 
-//   (select json_agg(alb)
-//   from (
-//     select * from albums where artist_id = a.id
-//   ) alb
-// ) as albums
-// from artists as a) art;
-
-// {"id":1,"name":"AC/DC","albums":[
-//   {"id":1,"title":"For Those About To Rock We Salute You","artist_id":1}, +
-//   {"id":4,"title":"Let There Be Rock","artist_id":1}
-// ]}
-// {"id":2,"name":"Accept","albums":[
-//   {"id":2,"title":"Balls to the Wall","artist_id":2},                    +
-//   {"id":3,"title":"Restless and Wild","artist_id":2}
-// ]}
-// {"id":3,"name":"Aerosmith","albums":[
-//   {"id":5,"title":"Big Ones","artist_id":3}
-// ]}
+// , question_id: 1, question_body: 1, question_date: 1, asker_name: 1, question_helpfulness: 1, reported: 1
+// {$project: {_id: 0, asker_email: 0, product_id: 0}},  
 
 module.exports = {
   read: ({product_id}, page, count) => {
-    let offset = (page - 1) * count;
+    let skip = (page - 1) * count;
 
-    let queryString = `
-      SELECT row_to_json(ans) AS answers
-      FROM (
-        SELECT a.id, a.body, a.answer_date AS date, a.answerer_name, a.helpfulness,
-        (SELECT json_agg(p)
-          FROM (
-            SELECT id, url from photos WHERE answer_id = a.id
-          ) p
-        ) AS photos
-      FROM answers AS a) ans
-    `;
-
-    // let queryString = `
-    //   SELECT
-    //     id,
-    //     body,
-    //     answer_date AS date,
-    //     answerer_name,
-    //     helpfulness
-    //   FROM
-    //     answers
-    //   WHERE EXISTS
-    //     question_id  (
-    //       SELECT
-    //         x.question_id
-    //       FROM (
-    //         SELECT 
-    //           id AS question_id,
-    //           question_body,
-    //           question_date,
-    //           asker_name,
-    //           question_helpfulness,
-    //           reported
-    //         FROM
-    //           questions
-    //         WHERE
-    //           product_id = ${product_id}
-    //             AND
-    //           reported = 0
-    //         ORDER BY
-    //           question_helpfulness DESC 
-    //         LIMIT 
-    //           ${count} 
-    //         OFFSET 
-    //           ${offset}
-    //       ) AS x
-    //     )
-    // `;
-
-    return db.query(queryString);
+    return (
+      // Question
+      //   .find({product_id: product_id}, 'question_id question_body question_date asker_name question_helpfulness reported answers -_id')
+      //   .skip(skip)
+      //   .limit(count)
+        // .populate('answers')
+    
+      
+      Question.aggregate([
+        {$match: {product_id: parseInt(product_id)}},
+        {$lookup: {from: 'combined_answers', localField: 'question_id', foreignField: 'question_id', as: 'temp_answers'}}
+      ])
+    );
   },
 
   create: ({product_id}, {body, name, email}) => {

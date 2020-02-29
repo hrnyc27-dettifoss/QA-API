@@ -18,6 +18,7 @@ const questionsSchema = new mongoose.Schema({
   question_helpfulness: Number,
   reported: Number,
   product_id: Number
+  // answers: [{type: mongoose.Schema.Types.ObjectId, ref: 'Answer'}]
 }, {collection: 'questions'});
 
 const answersSchema = new mongoose.Schema({
@@ -37,3 +38,4 @@ const Answer = mongoose.model('Answer', answersSchema);
 
 module.exports.Question = Question;
 module.exports.Answer = Answer;
+module.exports.connection = db;

@@ -37,8 +37,8 @@ const photoModel = require('../models/photoModel.js');
 
 module.exports = {
   getAnswers: (req, res) => {
-    let page = req.query.page ? req.query.page : 1;
-    let count = req.query.count ? req.query.count : 5;
+    let page = req.query.page ? parseInt(req.query.page) : 1;
+    let count = req.query.count ? parseInt(req.query.count) : 5;
     let result = {
       question: req.params.question_id,
       page: page,
