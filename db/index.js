@@ -18,7 +18,6 @@ const questionsSchema = new mongoose.Schema({
   question_helpfulness: Number,
   reported: Number,
   product_id: Number
-  // answers: [{type: mongoose.Schema.Types.ObjectId, ref: 'Answer'}]
 }, {collection: 'questions'});
 
 const answersSchema = new mongoose.Schema({
@@ -44,7 +43,6 @@ const Counter = mongoose.model('Counter', countersSchema);
 
 const getNextId = async (idName) => {
   let counterDocument = await Counter.findOneAndUpdate({_id: idName}, {$inc:{sequence_value: 1}}, {new: true});
-  //console.log(counterDocument.sequence_value);
 
   return counterDocument.sequence_value;
 }
@@ -54,4 +52,3 @@ module.exports.Answer = Answer;
 module.exports.Counter = Counter;
 module.exports.getNextId = getNextId;
 module.exports.mongooseTypes = mongoose.Types;
-module.exports.connection = db;

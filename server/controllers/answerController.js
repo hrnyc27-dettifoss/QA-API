@@ -1,39 +1,4 @@
 const answerModel = require('../models/answerModel.js');
-const photoModel = require('../models/photoModel.js');
-
-// {
-//   "question": "1",
-//   "page": 0,
-//   "count": 5,
-//   "results": [
-//     {
-//       "answer_id": 8,
-//       "body": "What a great question!",
-//       "date": "2018-01-04T00:00:00.000Z",
-//       "answerer_name": "metslover",
-//       "helpfulness": 8,
-//       "photos": [],
-//     },
-//     {
-//       "answer_id": 5,
-//       "body": "Something pretty durable but I can't be sure",
-//       "date": "2018-01-04T00:00:00.000Z",
-//       "answerer_name": "metslover",
-//       "helpfulness": 5,
-//       "photos": [{
-//           "id": 1,
-//           "url": "urlplaceholder/answer_5_photo_number_1.jpg"
-//         },
-//         {
-//           "id": 2,
-//           "url": "urlplaceholder/answer_5_photo_number_2.jpg"
-//         },
-//         // ...
-//       ]
-//     },
-//     // ...
-//   ]
-// }
 
 module.exports = {
   getAnswers: (req, res) => {
@@ -65,28 +30,30 @@ module.exports = {
   addAnswer: (req, res) => {
     answerModel.create(req.params, req.body)
       .then((data) => {
-        console.log(data);
         res.sendStatus(201);
       }).catch((err) => {
         console.error(err);
-        res.send(400);
+        res.sendStatus(400);
       })
   },
 
   markHelpful: (req, res) => {
     answerModel.updateHelpfulness(req.params)
       .then((data) => {
-        console.log(data);
-        res.sendStatus(201);
+        res.sendStatus(204);
       }).catch((err) => {
         console.error(err);
-        res.send(400);
+        res.sendStatus(400);
       });
   },
 
   reportAnswer: (req, res) => {
-    //answerModel.updateReported(req.params);
-
-    res.send('answer report');
+    answerModel.updateReported(req.params)
+      .then((data) => {
+        res.sendStatus(204);
+      }).catch((err) => {
+        console.error(err);
+        res.sendStatus(400);
+      });
   },
 }
