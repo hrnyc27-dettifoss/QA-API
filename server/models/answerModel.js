@@ -43,7 +43,8 @@ module.exports = {
 
   create: async ({question_id}, {body, name, email, photos}) => {
     let answer_id = await getNextId('answerid');
-    // let photo_id = await getNextId('photoid');
+    let today = new Date();
+    let date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
     let transformPhotos;
     
     if (photos.length > 0) {
@@ -65,6 +66,7 @@ module.exports = {
         return Answer.create({
           answer_id: answer_id,
           body: body,
+          answer_date: date,
           answerer_name: name,
           email: email,
           helpfulness: 0,
