@@ -95,9 +95,15 @@ module.exports = {
   },
 
   markHelpful: (req, res) => {
-    //questionModel.updateHelpfulness(req.params);
-
-    res.send('question helpful');
+    questionModel.updateHelpfulness(req.params)
+      .then((data) => {
+        console.log(data);
+        res.sendStatus(200);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.sendStatus(400);
+      });
   },
 
   reportQuestion: (req, res) => {

@@ -74,9 +74,14 @@ module.exports = {
   },
 
   markHelpful: (req, res) => {
-    //answerModel.updateHelpfulness(req.params);
-
-    res.send('answer helpful');
+    answerModel.updateHelpfulness(req.params)
+      .then((data) => {
+        console.log(data);
+        res.sendStatus(201);
+      }).catch((err) => {
+        console.error(err);
+        res.send(400);
+      });
   },
 
   reportAnswer: (req, res) => {

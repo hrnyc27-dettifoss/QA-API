@@ -78,18 +78,10 @@ module.exports = {
   },
 
   updateHelpfulness: ({answer_id}) => {
-    let queryString = `
-      
-    `;
-
-    db.query(queryString);
+    return Answer.findOneAndUpdate({answer_id: answer_id}, {$inc:{helpfulness: 1}}, {new: true});
   },
 
   updateReported: ({answer_id}) => {
-    let queryString = `
-      
-    `;
-
-    db.query(queryString);
+    // return Answer.findOneAndUpdate({answer_id: answer_id}, {reported: 1}, {new: true});
   }
 }
