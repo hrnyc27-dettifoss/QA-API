@@ -66,7 +66,7 @@ module.exports = {
         return Answer.create({
           answer_id: answer_id,
           body: body,
-          answer_date: date,
+          date: date,
           answerer_name: name,
           email: email,
           helpfulness: 0,

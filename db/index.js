@@ -24,7 +24,7 @@ const questionsSchema = new mongoose.Schema({
 const answersSchema = new mongoose.Schema({
   answer_id: Number,
   body: String,
-  answer_date: String,
+  date: String,
   answerer_name: String,
   email: String,
   helpfulness: Number,
