@@ -16,16 +16,15 @@ module.exports = {
     let page = req.query.page ? parseInt(req.query.page) : 1;
     let count = req.query.count ? parseInt(req.query.count) : 5;
     let result = {
-      product_id: req.params.product_id
+      product_id: req.params.product_id,
+      page: page,
+      count: count
     }
 
     questionModel.read(req.params, page, count)
       .then((data) => {
-        let offset = (page - 1) * count;
-        // SORT BEFORE SUBSETTING
-        let subset = data.slice(offset, offset + count);
 
-        subset.forEach((question) => {
+        data.forEach((question) => {
           question.answers = {};
           delete question._id;
           delete question.product_id;
@@ -49,7 +48,7 @@ module.exports = {
           })
           delete question.temp_answers;
         })
-        result.results = subset;
+        result.results = data;
         res.send(result);
       })
       .catch((err) => {
@@ -84,9 +83,15 @@ module.exports = {
   },
 
   addQuestion: (req, res) => {
-    //questionModel.create(req.params, req.body);
-
-    res.send('question post');
+    questionModel.create(req.params, req.body)
+      .then((data) => {
+        console.log(data);
+        res.sendStatus(201);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.sendStatus(400);
+      });
   },
 
   markHelpful: (req, res) => {
