@@ -1,4 +1,4 @@
-const {Answer} = require('../../db/index.js');
+const {Answer, getNextId, mongooseTypes} = require('../../db/index.js');
 
 // {
 //   "question": "1",
@@ -36,24 +36,43 @@ const {Answer} = require('../../db/index.js');
 
 module.exports = {
   read: ({question_id}, page, count) => {
-    
     let skip = (parseInt(page) - 1) * parseInt(count);
-    console.log(page, count, 2, 3);
-    console.log(question_id, 1);
 
     return Answer.find({question_id: parseInt(question_id)},'answer_id body date answerer_name helpfulness photos -_id').sort({helpfulness: -1}).skip(skip).limit(count);
   },
 
-  readAll: (question_id) => {
-    return Answer.find({question_id: question_id},'answer_id body date answerer_name helpfulness photos -_id');
-  },
+  create: async ({question_id}, {body, name, email, photos}) => {
+    let answer_id = await getNextId('answerid');
+    // let photo_id = await getNextId('photoid');
+    let transformPhotos;
+    
+    if (photos.length > 0) {
+      transformPhotos = Promise.all(photos.map(async (url) => {
+        let photo_id = await getNextId('photoid');
+        return {
+          _id: new mongooseTypes.ObjectId(),
+          id: photo_id,
+          url: url,
+          answer_id: answer_id
+        };
+      }));
+    } else {
+      transformedPhotos = [];
+    }
 
-  create: ({question_id}, {body, name, email}) => {
-    let queryString = `
-      
-    `;
-
-    db.query(queryString);
+    return transformPhotos
+      .then((transformedPhotos) => {
+        return Answer.create({
+          answer_id: answer_id,
+          body: body,
+          answerer_name: name,
+          email: email,
+          helpfulness: 0,
+          reported: 0,
+          question_id: question_id,
+          photos: transformedPhotos
+        });
+      });
   },
 
   updateHelpfulness: ({answer_id}) => {

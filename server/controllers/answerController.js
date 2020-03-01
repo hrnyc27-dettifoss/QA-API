@@ -63,9 +63,14 @@ module.exports = {
   },
 
   addAnswer: (req, res) => {
-    //answerModel.create(req.params, req.body);
-
-    res.send('answer post');
+    answerModel.create(req.params, req.body)
+      .then((data) => {
+        console.log(data);
+        res.sendStatus(201);
+      }).catch((err) => {
+        console.error(err);
+        res.send(400);
+      })
   },
 
   markHelpful: (req, res) => {
