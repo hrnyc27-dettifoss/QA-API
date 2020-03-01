@@ -1,39 +1,54 @@
-const sequelize = require('sequelize');
-const { host, user, password, database, port } = require('../config.js');
-const Promise = require('bluebird');
-const options = { promiseLib: Promise };
-const pgp = require('pg-promise')(options);
-const { Pool, Client } = require('pg');
+const mongoose = require('mongoose');
 
-// const pool = new Pool({
-//   user: user,
-//   host: host,
-//   database: database,
-//   password: password,
-//   port: port,
-// });
+mongoose.connect('mongodb://localhost/qa', {useNewUrlParser: true});
 
-// pool.on('error', (err) => {
-//   console.error('An idle client has experienced an error', err.stack)
-// })
+const db = mongoose.connection;
 
-// const client = new Client({
-//   user: user,
-//   host: host,
-//   database: database,
-//   password: password,
-//   port: port,
-// })
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('Connected to db...');
+})
 
-// client.connect();
+const questionsSchema = new mongoose.Schema({
+  question_id: Number,
+  question_body: String,
+  question_date: String,
+  asker_name: String,
+  asker_email: String,
+  question_helpfulness: Number,
+  reported: Number,
+  product_id: Number
+}, {collection: 'questions'});
 
-const connection = {
-  host: host,
-  port: port,
-  database: database,
-  user: user,
-  password: password
-};
-const db = pgp(connection);
+const answersSchema = new mongoose.Schema({
+  answer_id: Number,
+  body: String,
+  date: String,
+  answerer_name: String,
+  email: String,
+  helpfulness: Number,
+  reported: Number,
+  question_id: Number,
+  photos: Array
+}, {collection: 'combined_answers'});
 
-module.exports = db;
+const countersSchema = new mongoose.Schema({
+  _id: String,
+  sequence_value: Number
+}, {collection: 'counters'});
+
+const Question = mongoose.model('Question', questionsSchema);
+const Answer = mongoose.model('Answer', answersSchema);
+const Counter = mongoose.model('Counter', countersSchema);
+
+const getNextId = async (idName) => {
+  let counterDocument = await Counter.findOneAndUpdate({_id: idName}, {$inc:{sequence_value: 1}}, {new: true});
+
+  return counterDocument.sequence_value;
+}
+
+module.exports.Question = Question;
+module.exports.Answer = Answer;
+module.exports.Counter = Counter;
+module.exports.getNextId = getNextId;
+module.exports.mongooseTypes = mongoose.Types;
