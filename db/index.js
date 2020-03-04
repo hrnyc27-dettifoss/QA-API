@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/qa', {useNewUrlParser: true});
+mongoose.connect('mongodb://3.231.55.186/qa', {useNewUrlParser: true});
 
 const db = mongoose.connection;
 
