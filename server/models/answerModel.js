@@ -3,7 +3,7 @@ const {Answer, getNextId, mongooseTypes} = require('../../db/index.js');
 
 module.exports = {
   read: ({question_id}, page, count) => {
-    let skip = (parseInt(page) - 1) * parseInt(count);
+    let skip = (page - 1) * count;
 
     return Answer.find({question_id: parseInt(question_id), reported: 0},'answer_id body date answerer_name helpfulness photos -_id').sort({helpfulness: -1}).skip(skip).limit(count);
   },
